@@ -4,6 +4,54 @@ Bu repo, aynı veri seti (`dataset_500` — 500 görsel) ve aynı eğitim parame
 
 ---
 
+## 📦 Veri Seti
+
+**Kaynak:** [Roboflow Universe — License Plate Recognition](https://universe.roboflow.com/roboflow-universe-projects/license-plate-recognition-rxg4e) (Version 4)
+
+Orijinal veri seti binlerce görsel içermektedir. Bu çalışmada **adil ve hızlı bir karşılaştırma** yapabilmek amacıyla veri setinden **rastgele 500 görsel** seçilerek `dataset_500` alt kümesi oluşturulmuştur. Her üç model de tamamen aynı bu 500 görsellik alt kümeyle eğitilmiştir.
+
+### Veri Setini İndirme
+
+```python
+from roboflow import Roboflow
+
+API_KEY = "yVAoRyBc3LTryAZFrECk"
+rf = Roboflow(api_key=API_KEY)
+project = rf.workspace("roboflow-universe-projects").project("license-plate-recognition-rxg4e")
+
+# Tam veri setini indir (YOLOv8 formatında)
+dataset = project.version(4).download("yolov8", location="./dataset")
+```
+
+> ⚠️ **Not:** Yukarıdaki kod tam veri setini indirir. Bu çalışmada kullanılan `dataset_500`, indirilen bu tam veri setinden **rastgele 500 görsel seçilerek** oluşturulmuştur:
+>
+> ```python
+> import os, random, shutil
+>
+> random.seed(42)  # Tekrar üretilebilirlik için
+> all_images = os.listdir("./dataset/train/images")
+> selected = random.sample(all_images, 500)
+>
+> os.makedirs("./dataset_500/train/images", exist_ok=True)
+> os.makedirs("./dataset_500/train/labels", exist_ok=True)
+>
+> for img in selected:
+>     shutil.copy(f"./dataset/train/images/{img}", f"./dataset_500/train/images/{img}")
+>     label = img.replace(".jpg", ".txt")
+>     shutil.copy(f"./dataset/train/labels/{label}", f"./dataset_500/train/labels/{label}")
+> ```
+
+| Özellik | Değer |
+|---|---|
+| Kaynak | Roboflow Universe |
+| Proje | license-plate-recognition-rxg4e |
+| Versiyon | 4 |
+| Format | YOLOv8 |
+| Toplam Görsel (Subset) | **500** (rastgele seçim) |
+| Görev | Object Detection (Plaka Tespiti) |
+
+---
+
 ## 📊 Sonuç Özeti
 
 | Model | Epoch (Tamamlanan) | Precision | Recall | mAP@50 | mAP@50-95 | Parametre Sayısı |
