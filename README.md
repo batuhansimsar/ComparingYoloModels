@@ -1,62 +1,125 @@
-# YOLO Model Comparison for License Plate Detection
+# 🚗 YOLO License Plate Detection — Model Comparison
 
-Bu repo, farklı YOLO modellerinin (YOLO11n ve YOLO11m) plaka tespiti performanslarını karşılaştırmaktadır. 
+Bu repo, aynı veri seti (`dataset_500` — 500 görsel) ve aynı eğitim parametreleri (30 epoch, batch 8, imgsz 640) kullanılarak eğitilen üç farklı YOLO11 modelinin plaka tespiti sonuçlarını karşılaştırmaktadır.
 
-Üç farklı eğitim sonucunu inceledik. Modeller ve eğitim yapılandırmaları aşağıda listelenmiştir.
+---
 
-## Karşılaştırılan Modeller
+## 📊 Sonuç Özeti
 
-### 1. Model 1: YOLO11n (Plaka Modeli)
-- **Model**: `yolo11n.pt`
-- **Epoch**: 100
-- **Veri Seti**: Orijinal Veri Seti
-- **Sonuçlar (100. Epoch)**:
-  - **Precision**: %93.65 (0.936)
-  - **Recall**: %89.86 (0.899)
-  - **mAP50**: %93.65 (0.936)
-  - **mAP50-95**: %56.80 (0.568)
+| Model | Epoch (Tamamlanan) | Precision | Recall | mAP@50 | mAP@50-95 | Parametre Sayısı |
+|---|---|---|---|---|---|---|
+| 🥇 **YOLO11n** | 22 *(early stop)* | 0.920 | **0.909** | **0.976** | 0.525 | ~2.6M |
+| 🥈 YOLO11m Run 2 | 30 | 0.926 | 0.843 | 0.905 | **0.542** | ~20.1M |
+| 🥉 YOLO11m Run 1 | 29 | **0.947** | 0.806 | 0.877 | 0.509 | ~20.1M |
 
-YOLO11n modeli daha küçük bir model olmasına rağmen 100 epoch eğitildiği için yüksek precision ve recall değerlerine ulaşmıştır. mAP skorları oldukça başarılıdır.
+> **🏆 Kazanan: YOLO11n** — Hem en yüksek mAP@50 (%97.6) hem de en yüksek Recall değerine sahip. 22 epoch'ta early stopping ile durmasına rağmen diğer modelleri geçti. Hem daha hızlı eğitildi, hem de daha hafif bir mimari sundu.
 
-![YOLO11n Eğitim Sonuçları](images/yolo11n_results.png)
+---
 
-### 2. Model 2: YOLO11m (Eğitim Run 1)
-- **Model**: `yolo11m.pt`
-- **Epoch**: 30 (29 epoch tamamlandı)
-- **Veri Seti**: 500 Görsellik Alt Küme (dataset_500)
-- **Sonuçlar (29. Epoch)**:
-  - **Precision**: %94.66 (0.947)
-  - **Recall**: %80.58 (0.806)
-  - **mAP50**: %87.71 (0.877)
-  - **mAP50-95**: %50.89 (0.509)
+## 🏆 En İyi Model: YOLO11n
 
-YOLO11m modeli daha büyük bir mimariye sahip olsa da bu testte yalnızca 30 epoch çalıştırılmış ve daha küçük bir veri kümesi kullanılmıştır. Precision daha yüksekken Recall değerinde bir miktar düşüş yaşanmıştır.
+### Neden YOLO11n kazandı?
 
-![YOLO11m Run 1 Eğitim Sonuçları](images/yolo11m_run1_results.png)
+**mAP@50 = 0.976** → Bu, modelin plakaları %97.6 oranında doğru tespit ettiği anlamına gelir.
 
-### 3. Model 3: YOLO11m (Eğitim Run 2)
-- **Model**: `yolo11m.pt`
-- **Epoch**: 30
-- **Veri Seti**: 500 Görsellik Alt Küme (dataset_500)
-- **Sonuçlar (30. Epoch)**:
-  - **Precision**: %92.61 (0.926)
-  - **Recall**: %84.30 (0.843)
-  - **mAP50**: %90.54 (0.905)
-  - **mAP50-95**: %54.22 (0.542)
+- ✅ **Recall 0.909** — Görseldeki plakaların %90.9'unu kaçırmadan buldu (YOLO11m'e göre +10 puan)
+- ✅ **mAP50 0.976** — Tüm modeller arasında en yüksek değer (+7 puan fark)
+- ✅ **22 epoch'ta converge** — Daha az eğitimle daha iyi sonuç → verimlilik
+- ✅ **~2.6M parametre** — YOLO11m'in (%20M) çok daha altında → gerçek zamanlı uygulamalar için idealdir
+- ✅ **Küçük model boyutu** — Edge cihazlar, Raspberry Pi, mobil uygulamalar için uygun
 
-Aynı konfigürasyonlarla yapılan ikinci YOLO11m eğitiminde Recall ve mAP skorlarında önceki run'a göre iyileşme görülmektedir. Toplam performans YOLO11n'in (100 epoch) biraz altında kalmıştır ancak bunun sebebi az sayıdaki epoch ve veri sayısıdır.
+### YOLO11n Eğitim Grafikleri
 
-![YOLO11m Run 2 Eğitim Sonuçları](images/yolo11m_run2_results.png)
+![YOLO11n Eğitim Sonuçları](images/yolo11n/results.png)
 
-## Sonuç Özeti
+| F1 Curve | PR Curve |
+|---|---|
+| ![YOLO11n F1](images/yolo11n/BoxF1_curve.png) | ![YOLO11n PR](images/yolo11n/BoxPR_curve.png) |
 
-| Model | Epoch | Precision | Recall | mAP50 | mAP50-95 | Veri Seti |
-|-------|-------|-----------|--------|-------|----------|-----------|
-| YOLO11n | 100 | **0.936** | **0.899** | **0.936** | **0.568** | Orijinal Data |
-| YOLO11m (Run 1) | 30 | 0.947 | 0.806 | 0.877 | 0.509 | 500 Görsel |
-| YOLO11m (Run 2) | 30 | 0.926 | 0.843 | 0.905 | 0.542 | 500 Görsel |
+| Confusion Matrix | Confusion Matrix (Normalized) |
+|---|---|
+| ![YOLO11n CM](images/yolo11n/confusion_matrix.png) | ![YOLO11n CM Norm](images/yolo11n/confusion_matrix_normalized.png) |
 
-### Değerlendirme
-- En iyi genel performansı mAP50 ve Recall bazında **YOLO11n (100 Epoch)** vermiştir. 
-- YOLO11m modeli daha karmaşık olsa da 500 görsellik alt kümeyle ve sadece 30 epoch eğitildiğinden tam potansiyeline ulaşmamış görünmektedir.
-- Daha güçlü olan YOLO11m modelini veri setinin tamamında ve 100+ epoch çalıştırarak en iyi model performansına erişilmesi önerilir.
+**Validation tahminleri:**
+
+![YOLO11n Val Predictions](images/yolo11n/val_batch0_pred.jpg)
+
+---
+
+## 🔵 YOLO11m — Run 1
+
+> Aynı `dataset_500` ile 29 epoch. Recall düşük kalmış (%80.6), validation sırasında birkaç epoch'ta `nan` loss yaşandı (muhtemelen büyük batch instability).
+
+### Eğitim Grafikleri
+
+![YOLO11m Run1 Eğitim Sonuçları](images/yolo11m_run1/results.png)
+
+| F1 Curve | PR Curve |
+|---|---|
+| ![Run1 F1](images/yolo11m_run1/BoxF1_curve.png) | ![Run1 PR](images/yolo11m_run1/BoxPR_curve.png) |
+
+| Confusion Matrix | Confusion Matrix (Normalized) |
+|---|---|
+| ![Run1 CM](images/yolo11m_run1/confusion_matrix.png) | ![Run1 CM Norm](images/yolo11m_run1/confusion_matrix_normalized.png) |
+
+**Validation tahminleri:**
+
+![YOLO11m Run1 Val](images/yolo11m_run1/val_batch0_pred.jpg)
+
+---
+
+## 🟣 YOLO11m — Run 2
+
+> Aynı konfigürasyonla tekrar çalıştırılan YOLO11m eğitimi. Recall ve mAP değerleri Run 1'e göre belirgin şekilde iyileşti. Parametre optimizasyonu açısından Run 1'den daha kararlı bir eğitim süreci geçirdi.
+
+### Eğitim Grafikleri
+
+![YOLO11m Run2 Eğitim Sonuçları](images/yolo11m_run2/results.png)
+
+| F1 Curve | PR Curve |
+|---|---|
+| ![Run2 F1](images/yolo11m_run2/BoxF1_curve.png) | ![Run2 PR](images/yolo11m_run2/BoxPR_curve.png) |
+
+| Confusion Matrix | Confusion Matrix (Normalized) |
+|---|---|
+| ![Run2 CM](images/yolo11m_run2/confusion_matrix.png) | ![Run2 CM Norm](images/yolo11m_run2/confusion_matrix_normalized.png) |
+
+**Validation tahminleri:**
+
+![YOLO11m Run2 Val](images/yolo11m_run2/val_batch0_pred.jpg)
+
+---
+
+## ⚙️ Eğitim Konfigürasyonu
+
+| Parametre | YOLO11n | YOLO11m Run 1 | YOLO11m Run 2 |
+|---|---|---|---|
+| Base Model | `yolo11n.pt` | `yolo11m.pt` | `yolo11m.pt` |
+| Dataset | `dataset_500` | `dataset_500` | `dataset_500` |
+| Max Epochs | 30 | 30 | 30 |
+| Tamamlanan Epoch | 22 | 29 | 30 |
+| Batch Size | 8 | 8 | 8 |
+| Image Size | 640 | 640 | 640 |
+| Optimizer | Auto | Auto | Auto |
+| Early Stopping Patience | 10 | 10 | 10 |
+| Cache | RAM | RAM | RAM |
+| Device | GPU (Colab) | GPU (Colab) | GPU (Colab) |
+
+---
+
+## 💡 Sonuç ve Öneriler
+
+### Kullanım Senaryosu Bazlı Öneri
+
+| Senaryo | Önerilen Model |
+|---|---|
+| 🚀 Gerçek zamanlı / Edge cihaz | **YOLO11n** |
+| 💻 Yüksek doğruluk / sunucu taraflı | **YOLO11m Run 2** |
+| 🔬 Araştırma & Daha fazla epoch | YOLO11m (100+ epoch dene) |
+
+### Neden YOLO11m tam potansiyeline ulaşamadı?
+1. **500 görsel az**: YOLO11m gibi büyük bir model, daha fazla veri gerektirir (önerilir: 5000+)
+2. **30 epoch yetersiz**: Büyük modeller daha fazla epoch'ta stabilize olur (önerilir: 100+)
+3. **nan loss sorunu**: Run 1'de bazı epoch'larda validation loss `nan` döndü → eğitim instability işareti
+
+> **Sonuç:** Mevcut konfigürasyonla **YOLO11n açık ara en iyi modeldir**. YOLO11m'in gerçek potansiyelini görmek için tam veri seti + 100 epoch denenmesi önerilir.
