@@ -15,7 +15,7 @@ Orijinal veri seti binlerce görsel içermektedir. Bu çalışmada **adil ve hı
 ```python
 from roboflow import Roboflow
 
-API_KEY = "yVAoRyBc3LTryAZFrECk"
+API_KEY = "YOUR_ROBOFLOW_API_KEY"  # Roboflow hesabından alabilirsin
 rf = Roboflow(api_key=API_KEY)
 project = rf.workspace("roboflow-universe-projects").project("license-plate-recognition-rxg4e")
 
